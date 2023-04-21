@@ -71,8 +71,14 @@ namespace NZWalks.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddRegionAsync(Models.DTO.AddRegionRequest addRegionRequest)
+        public async Task<IActionResult> AddRegionAsync(Models.DTO.AddRegionRequest addRegionRequest)                                                                                                                               
         {
+            //Validate the Request  
+            if (!ValidateAddRegionAsync(addRegionRequest))  // ! means false - Validation failed
+            {
+                return BadRequest(ModelState);  //ModelState will show errors
+            }
+
             // Request(DTO) to Domain model
             var region = new Models.Domain.Region()
             {
@@ -136,8 +142,15 @@ namespace NZWalks.API.Controllers
 
         [HttpPut]
         [Route("{id:guid}")]
-        public async Task<IActionResult> UpdateRegionAsync([FromRoute] Guid id, [FromBody] Models.DTO.UpdateRegionRequest updateRegionRequest) 
+        public async Task<IActionResult> UpdateRegionAsync([FromRoute] Guid id, 
+            [FromBody] Models.DTO.UpdateRegionRequest updateRegionRequest) 
         {
+            // Validate incoming data
+            if (!ValidateUpdateRegionAsync(updateRegionRequest))  // ! means false
+            {
+                return BadRequest(ModelState);
+            }
+
             // Convert DTO to domain model
 
             var region = new Models.Domain.Region()
@@ -178,5 +191,129 @@ namespace NZWalks.API.Controllers
             return Ok(regionDTO);
 
         }
+
+        //Validations
+
+        #region Private Methods  
+
+        private bool ValidateAddRegionAsync(Models.DTO.AddRegionRequest addRegionRequest)
+        {
+            if (addRegionRequest == null)
+            {
+                ModelState.AddModelError(nameof(addRegionRequest),
+                    $"Add Region Data Required.");
+              //  return false;
+            }
+            if (string.IsNullOrWhiteSpace(addRegionRequest.Code))
+            {
+                ModelState.AddModelError(nameof(addRegionRequest.Code),
+                    $"{nameof(addRegionRequest.Code)} cannot be Null or Empty.");
+             //   return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(addRegionRequest.Name))
+            {
+                ModelState.AddModelError(nameof(addRegionRequest.Name),
+                    $"{nameof(addRegionRequest.Name)} cannot be Null or Empty.");
+             //   return false;
+            }
+
+            if (addRegionRequest.Area <= 0)
+            {
+                ModelState.AddModelError(nameof(addRegionRequest.Area),
+                    $"{nameof(addRegionRequest.Area)} cannot be less than or equal to zero.");
+             //   return false;
+            }
+
+            if (addRegionRequest.Lat == 0)
+            {
+                ModelState.AddModelError(nameof(addRegionRequest.Lat),
+                    $"{nameof(addRegionRequest.Lat)} cannot equal to zero.");
+             //   return false;
+            }
+
+            if (addRegionRequest.Long == 0)
+            {
+                ModelState.AddModelError(nameof(addRegionRequest.Long),
+                    $"{nameof(addRegionRequest.Long)} cannot be equal to zero.");
+            //    return false;
+            }
+
+            if (addRegionRequest.Population < 0)
+            {
+                ModelState.AddModelError(nameof(addRegionRequest.Population),
+                    $"{nameof(addRegionRequest.Population)} cannot be less than zero.");
+            //    return false;
+            }
+
+            if (ModelState.ErrorCount > 0)  //Do this instead of return false on each check to accumulate all the errors
+            {
+                return false;
+            }
+
+            return true;    
+        }
+
+        private bool ValidateUpdateRegionAsync(Models.DTO.UpdateRegionRequest updateRegionRequest)
+        {
+            if (updateRegionRequest == null)
+            {
+                ModelState.AddModelError(nameof(updateRegionRequest),
+                    $"Update Region Data Required.");
+                return false;
+            }
+            if (string.IsNullOrWhiteSpace(updateRegionRequest.Code))
+            {
+                ModelState.AddModelError(nameof(updateRegionRequest.Code),
+                    $"{nameof(updateRegionRequest.Code)} cannot be Null or Empty.");
+                //   return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(updateRegionRequest.Name))
+            {
+                ModelState.AddModelError(nameof(updateRegionRequest.Name),
+                    $"{nameof(updateRegionRequest.Name)} cannot be Null or Empty.");
+                //   return false;
+            }
+
+            if (updateRegionRequest.Area <= 0)
+            {
+                ModelState.AddModelError(nameof(updateRegionRequest.Area),
+                    $"{nameof(updateRegionRequest.Area)} cannot be less than or equal to zero.");
+                //   return false;
+            }
+
+            if (updateRegionRequest.Lat == 0)
+            {
+                ModelState.AddModelError(nameof(updateRegionRequest.Lat),
+                    $"{nameof(updateRegionRequest.Lat)} cannot be equal to zero.");
+                //   return false;
+            }
+
+            if (updateRegionRequest.Long == 0)
+            {
+                ModelState.AddModelError(nameof(updateRegionRequest.Long),
+                    $"{nameof(updateRegionRequest.Long)} cannot be equal to zero.");
+                //    return false;
+            }
+
+            if (updateRegionRequest.Population < 0)
+            {
+                ModelState.AddModelError(nameof(updateRegionRequest.Population),
+                    $"{nameof(updateRegionRequest.Population)} cannot be less than zero.");
+                //    return false;
+            }
+
+            if (ModelState.ErrorCount > 0)  //Do this instead of return false on each check to accumulate all the errors
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        #endregion
+
     }
+
 }
